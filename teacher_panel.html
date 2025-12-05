@@ -1,0 +1,963 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Teacher Panel</title>
+  <style>
+    /* ---------- Basic reset ---------- */
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    body {
+      background: url('bg.png') no-repeat center center fixed;
+      background-size: cover;
+      color: #222;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      position: relative;
+    }
+
+    /* ---------- Layout ---------- */
+    .app {
+      display: flex;
+      min-height: 100vh;
+      gap: 28px;
+      padding: 28px;
+    }
+
+    aside.sidebar {
+      width: 260px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(220, 20, 30, 0.06);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 28px;
+      left: 28px;
+      height: calc(100vh - 56px);
+      overflow-y: auto;
+      gap: 20px;
+    }
+
+    main {
+      flex: 1;
+      min-width: 0;
+      margin-left: 288px;
+    }
+
+    /* ---------- Sidebar content ---------- */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #f8f8f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      border: 2px solid rgba(220, 20, 30, 0.12);
+    }
+
+    .logo-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .brand h3 {
+      margin: 0;
+      font-size: 24px;
+      color: #b30000;
+      font-weight: 700;
+    }
+
+    nav.menu {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    nav.menu button {
+      text-align: left;
+      background: transparent;
+      border: none;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #333;
+    }
+
+    nav.menu button.active {
+      background: linear-gradient(180deg, rgba(255, 235, 235, 0.9), rgba(255, 245, 245, 0.9));
+      color: #b30000;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    /* ---------- Page header ---------- */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .page-header h1 {
+      margin: 0;
+      font-size: 22px;
+      color: #111;
+    }
+
+    .small-note {
+      color: #666;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    /* ---------- Card & glass boxes ---------- */
+    .card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .glass {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.6));
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid rgba(179, 0, 0, 0.06);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+    }
+
+    /* ---------- Buttons ---------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid rgba(179, 0, 0, 0.12);
+    }
+
+    .btn.primary {
+      background: #b30000;
+      color: #fff;
+      border-color: rgba(179, 0, 0, 0.9);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: #b30000;
+      border: 1px solid rgba(179, 0, 0, 0.12);
+    }
+
+    .btn.small {
+      padding: 6px 8px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    /* ---------- Table styles ---------- */
+    .table-wrap {
+      overflow: auto;
+      margin-top: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 700px;
+      background: #fff;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #555;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      background: linear-gradient(180deg, #fff, #fafafa);
+    }
+
+    tbody td {
+      padding: 12px 14px;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.03);
+      font-size: 14px;
+      color: #222;
+      vertical-align: middle;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: rgba(0, 0, 0, 0.01);
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .pill.gray {
+      background: #f3f3f3;
+      color: #444;
+      border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .pill.red {
+      background: #fff0f0;
+      color: #b30000;
+      border: 1px solid rgba(179, 0, 0, 0.08);
+    }
+
+    /* ---------- Form inputs ---------- */
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #333;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    select,
+    input[type="file"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .col {
+      flex: 1;
+    }
+
+    /* ---------- Small utilities ---------- */
+    .muted {
+      color: #777;
+      font-size: 13px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #666;
+    }
+
+    /* ---------- Alerts ---------- */
+    .alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      font-weight: 600;
+      max-width: 300px;
+      word-wrap: break-word;
+    }
+
+    .alert.success {
+      background: #d4edda;
+      border-color: #c3e6cb;
+      color: #155724;
+    }
+
+    .alert.error {
+      background: #f8d7da;
+      border-color: #f5c6cb;
+      color: #721c24;
+    }
+
+    /* responsive */
+    @media (max-width:900px) {
+      aside.sidebar {
+        display: none;
+      }
+
+      .app {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <input type="hidden" id="teacherId" value="1" /> <!-- Placeholder, should be set dynamically -->
+  <div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar card" aria-label="Sidebar">
+      <div class="brand">
+        <div class="logo-circle" title="eknows logo">
+          <img src="eknows-logo.png" alt="eknows logo" id="teacher-logo" />
+          <span id="logo-fallback" style="display:none; font-weight:800; color:#b30000;">T</span>
+        </div>
+        <div>
+          <h3>Teacher</h3>
+          <div class="small-note muted">Signed in</div>
+        </div>
+      </div>
+
+      <nav class="menu" role="navigation" aria-label="Main menu">
+        <button class="active" data-view="dashboard">Dashboard</button>
+        <button data-view="subjects">Subject Management</button>
+        <button data-view="materials">Material Management</button>
+        <button onclick="logout()">Logout</button>
+      </nav>
+
+      <div style="margin-top:auto;">
+        <div class="muted small">Version 1.0</div>
+      </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <main>
+      <!-- DASHBOARD VIEW -->
+      <section id="view-dashboard">
+        <div class="page-header">
+          <div>
+            <h1>Dashboard</h1>
+            <div class="small-note">Overview of your uploads</div>
+          </div>
+        </div>
+
+        <!-- Real-time Tracking -->
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <div style="font-weight:800; font-size:15px;">Real-time Tracking</div>
+              <div class="small muted">Daily uploads</div>
+            </div>
+            <div>
+              <div class="muted small">Records per page:
+                <select id="rt-per-page" onchange="renderRealtimeTable()">
+                  <option>10</option>
+                  <option>25</option>
+                  <option>50</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table id="realtime-table">
+              <thead>
+                <tr>
+                  <th>Program</th>
+                  <th>Subject</th>
+                  <th>Category</th>
+                  <th style="width:140px;">Daily Uploads</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Data Visualization -->
+        <div class="card" style="margin-top:18px;">
+          <div class="section-title">
+            <div>
+              <div style="font-weight:800; font-size:15px;">Data Visualization</div>
+              <div class="small muted">Overall uploads</div>
+            </div>
+            <div class="muted small">Search: <input type="text" id="global-search" placeholder="Search..."
+                oninput="renderOverallTable()" /></div>
+          </div>
+
+          <div class="table-wrap">
+            <table id="overall-table">
+              <thead>
+                <tr>
+                  <th>Program</th>
+                  <th>Subject</th>
+                  <th>Category</th>
+                  <th style="width:160px;">Total Uploads</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SUBJECTS VIEW -->
+      <section id="view-subjects" style="display:none;">
+        <div class="page-header">
+          <div>
+            <h1>Subject Management</h1>
+            <div class="small-note">Manage your handled subjects</div>
+          </div>
+        </div>
+
+        <div class="glass card">
+          <div class="row">
+            <div class="col">
+              <label>Program</label>
+              <select id="assign-subject-program">
+                <option value="">Select Program</option>
+              </select>
+            </div>
+            <div class="col">
+              <label>Grade Level</label>
+              <select id="assign-subject-grade">
+                <option value="">Select Grade Level</option>
+              </select>
+            </div>
+            <div class="col">
+              <label>Semester</label>
+              <select id="assign-subject-semester">
+                <option value="">Select Semester</option>
+              </select>
+            </div>
+            <div class="col">
+              <label>Subject</label>
+              <select id="assign-subject-name">
+                <option value="">Select Subject</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+            <button class="btn primary" onclick="assignSubjectFromForm()">Assign</button>
+            <button class="btn ghost" onclick="clearAssignForm()">Cancel</button>
+          </div>
+        </div>
+
+
+
+        <div class="card" style="margin-top:18px;">
+          <div class="section-title">
+            <div style="font-weight:800;">Handled Subjects</div>
+          </div>
+          <div class="table-wrap">
+            <table id="subjects-table">
+              <thead>
+                <tr>
+                  <th>Program</th>
+                  <th>Grade Level</th>
+                  <th>Semester</th>
+                  <th>Subject</th>
+                  <th style="width:140px;">Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- MATERIALS VIEW -->
+      <section id="view-materials" style="display:none;">
+        <div class="page-header">
+          <div>
+            <h1>Material Management</h1>
+            <div class="small-note">Upload and manage materials</div>
+          </div>
+        </div>
+
+        <div class="glass card">
+          <div class="row">
+            <div class="col">
+              <label>Program</label>
+              <select id="new-material-program">
+                <option value="">Select Program</option>
+              </select>
+            </div>
+            <div class="col">
+              <label>Grade Level</label>
+              <select id="new-material-grade">
+                <option value="">Select Grade Level</option>
+              </select>
+            </div>
+            <div class="col">
+              <label>Semester</label>
+              <select id="new-material-semester">
+                <option value="">Select Semester</option>
+              </select>
+            </div>
+            <div class="col">
+              <label>Subject</label>
+              <select id="new-material-subject">
+                <option value="">Select Subject</option>
+              </select>
+            </div>
+            <div class="col">
+              <label>Category</label>
+              <select id="new-material-category">
+                <option value="">Select Category</option>
+                <option value="notes">Notes</option>
+                <option value="announcement">Announcement</option>
+                <option value="modules">Modules</option>
+                <option value="reviewers">Reviewers</option>
+              </select>
+            </div>
+          </div>
+          <label for="new-material-file" style="margin-top:12px;">Upload Material</label>
+          <input type="file" id="new-material-file" />
+          <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+            <button class="btn primary" onclick="addMaterial()">Upload</button>
+            <button class="btn ghost" onclick="clearMaterialForm()">Cancel</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:18px;">
+          <div class="section-title">
+            <div style="font-weight:800;">Uploaded Materials</div>
+          </div>
+          <div id="materials-hierarchy"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    const views = {
+      dashboard: document.getElementById('view-dashboard'),
+      subjects: document.getElementById('view-subjects'),
+      materials: document.getElementById('view-materials')
+    };
+    document.querySelectorAll('nav.menu button').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        document.querySelectorAll('nav.menu button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const view = btn.dataset.view;
+        for (const k in views) views[k].style.display = (k === view ? '' : 'none');
+        if (view === 'subjects') {
+          await loadAllSubjects();
+          await loadSubjectsTable();
+        } else if (view === 'materials') {
+          await loadHandledSubjects();
+          await populateMaterialDropdowns();
+        }
+      });
+    });
+
+    function formatCell(txt) { return txt == null ? '' : String(txt); }
+
+    // ---------- DASHBOARD ----------
+    const teacherId = document.getElementById('teacherId').value;
+    async function fetchRealtime() {
+      const res = await fetch(`http://127.0.0.1:8080/api/teacher/daily-uploads?teacher_id=${teacherId}`);
+      return (await res.json()).data || [];
+    }
+    async function renderRealtimeTable() {
+      const perPage = parseInt(document.getElementById('rt-per-page').value || 10, 10);
+      const data = await fetchRealtime();
+      const tbody = document.querySelector('#realtime-table tbody');
+      tbody.innerHTML = '';
+      data.slice(0, perPage).forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${formatCell(r.program)}</td>
+          <td>${formatCell(r.subject)}</td>
+          <td>${formatCell(r.category)}</td>
+          <td><div class="pill red" style="font-weight:800">${r.uploads}</div></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function fetchOverall() {
+      const res = await fetch(`http://127.0.0.1:8080/api/teacher/total-uploads?teacher_id=${teacherId}`);
+      return (await res.json()).data || [];
+    }
+    async function renderOverallTable() {
+      const search = document.getElementById('global-search').value.trim().toLowerCase();
+      const data = await fetchOverall();
+      const tbody = document.querySelector('#overall-table tbody');
+      tbody.innerHTML = '';
+      data.filter(r => !search || [r.program, r.subject, r.category].join(' ').toLowerCase().includes(search))
+        .forEach(r => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+          <td>${formatCell(r.program)}</td>
+          <td>${formatCell(r.subject)}</td>
+          <td>${formatCell(r.category)}</td>
+          <td><div class="pill gray" style="font-weight:800">${r.uploads}</div></td>
+        `;
+          tbody.appendChild(tr);
+        });
+    }
+
+    // ---------- SUBJECTS ----------
+    let allSubjects = [];
+    let handledSubjects = [];
+
+    async function fetchSubjects() {
+      const res = await fetch(`http://127.0.0.1:8080/api/teacher/subjects?teacher_id=${teacherId}`);
+      return (await res.json()).data || [];
+    }
+
+    async function loadAllSubjects() {
+      const res = await fetch('http://127.0.0.1:8080/api/admin/get-subjects');
+      const j = await res.json();
+      allSubjects = j.subjects || [];
+      populateProgramDropdown();
+    }
+
+    async function loadHandledSubjects() {
+      handledSubjects = await fetchSubjects();
+    }
+
+    function populateMaterialDropdowns() {
+      const programSelect = document.getElementById('new-material-program');
+      programSelect.innerHTML = '<option value="">Select Program</option>';
+      const uniquePrograms = [...new Set(handledSubjects.map(s => s.program))];
+      uniquePrograms.forEach(program => {
+        const opt = document.createElement('option');
+        opt.value = program;
+        opt.textContent = program;
+        programSelect.appendChild(opt);
+      });
+    }
+
+    function populateMaterialGradeDropdown() {
+      const program = document.getElementById('new-material-program').value;
+      const gradeSelect = document.getElementById('new-material-grade');
+      gradeSelect.innerHTML = '<option value="">Select Grade Level</option>';
+      if (program) {
+        const filtered = handledSubjects.filter(s => s.program === program);
+        const uniqueGrades = [...new Set(filtered.map(s => s.grade_level))];
+        uniqueGrades.forEach(grade => {
+          const opt = document.createElement('option');
+          opt.value = grade;
+          opt.textContent = grade;
+          gradeSelect.appendChild(opt);
+        });
+      }
+    }
+
+    function populateMaterialSemesterDropdown() {
+      const program = document.getElementById('new-material-program').value;
+      const grade = document.getElementById('new-material-grade').value;
+      const semesterSelect = document.getElementById('new-material-semester');
+      semesterSelect.innerHTML = '<option value="">Select Semester</option>';
+      if (program && grade) {
+        const filtered = handledSubjects.filter(s => s.program === program && s.grade_level === grade);
+        const uniqueSemesters = [...new Set(filtered.map(s => s.semester))];
+        uniqueSemesters.forEach(semester => {
+          const opt = document.createElement('option');
+          opt.value = semester;
+          opt.textContent = semester;
+          semesterSelect.appendChild(opt);
+        });
+      }
+    }
+
+    function populateMaterialSubjectDropdown() {
+      const program = document.getElementById('new-material-program').value;
+      const grade = document.getElementById('new-material-grade').value;
+      const semester = document.getElementById('new-material-semester').value;
+      const subjectSelect = document.getElementById('new-material-subject');
+      subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+      if (program && grade && semester) {
+        const filtered = handledSubjects.filter(s => s.program === program && s.grade_level === grade && s.semester === semester);
+        filtered.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.subject;
+          opt.textContent = s.subject;
+          subjectSelect.appendChild(opt);
+        });
+      }
+    }
+
+    function populateProgramDropdown() {
+      const programSelect = document.getElementById('assign-subject-program');
+      programSelect.innerHTML = '<option value="">Select Program</option>';
+      const uniquePrograms = [...new Set(allSubjects.map(s => s.program))];
+      uniquePrograms.forEach(program => {
+        const opt = document.createElement('option');
+        opt.value = program;
+        opt.textContent = program;
+        programSelect.appendChild(opt);
+      });
+    }
+
+    function populateAssignGradeDropdown() {
+      const program = document.getElementById('assign-subject-program').value;
+      const gradeSelect = document.getElementById('assign-subject-grade');
+      gradeSelect.innerHTML = '<option value="">Select Grade Level</option>';
+      if (program) {
+        const filtered = allSubjects.filter(s => s.program === program);
+        const uniqueGrades = [...new Set(filtered.map(s => s.grade_level))];
+        uniqueGrades.forEach(grade => {
+          const opt = document.createElement('option');
+          opt.value = grade;
+          opt.textContent = grade;
+          gradeSelect.appendChild(opt);
+        });
+      }
+      // Reset subsequent dropdowns
+      document.getElementById('assign-subject-semester').innerHTML = '<option value="">Select Semester</option>';
+      document.getElementById('assign-subject-name').innerHTML = '<option value="">Select Subject</option>';
+    }
+
+    function populateAssignSemesterDropdown() {
+      const program = document.getElementById('assign-subject-program').value;
+      const grade = document.getElementById('assign-subject-grade').value;
+      const semesterSelect = document.getElementById('assign-subject-semester');
+      semesterSelect.innerHTML = '<option value="">Select Semester</option>';
+      if (program && grade) {
+        const filtered = allSubjects.filter(s => s.program === program && s.grade_level === grade);
+        const uniqueSemesters = [...new Set(filtered.map(s => s.semester))];
+        uniqueSemesters.forEach(semester => {
+          const opt = document.createElement('option');
+          opt.value = semester;
+          opt.textContent = semester;
+          semesterSelect.appendChild(opt);
+        });
+      }
+      // Reset subject dropdown
+      document.getElementById('assign-subject-name').innerHTML = '<option value="">Select Subject</option>';
+    }
+
+    function populateSubjectDropdown() {
+      const program = document.getElementById('assign-subject-program').value;
+      const grade = document.getElementById('assign-subject-grade').value;
+      const semester = document.getElementById('assign-subject-semester').value;
+      const subjectSelect = document.getElementById('assign-subject-name');
+      subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+      if (program && grade && semester) {
+        const filteredSubjects = allSubjects.filter(s => s.program === program && s.grade_level === grade && s.semester === semester);
+        filteredSubjects.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.textContent = s.subject;
+          subjectSelect.appendChild(opt);
+        });
+      }
+    }
+
+    async function assignSubjectFromForm() {
+      const subjectId = document.getElementById('assign-subject-name').value;
+      if (!subjectId) { alert('Please select all fields'); return; }
+      const tid = document.getElementById('teacherId').value;
+      const res = await fetch('http://127.0.0.1:8080/api/teacher/assign-subject', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ subject_id: subjectId, teacher_id: tid }) });
+      const j = await res.json();
+      if (res.ok) {
+        alert('Subject assigned');
+        loadSubjectsTable();
+        clearAssignForm();
+      } else {
+        alert(j.message || 'Assign failed');
+      }
+    }
+
+    function clearAssignForm() {
+      document.getElementById('assign-subject-program').value = '';
+      document.getElementById('assign-subject-grade').value = '';
+      document.getElementById('assign-subject-semester').value = '';
+      document.getElementById('assign-subject-name').value = '';
+    }
+
+    async function loadSubjectsTable() {
+      const data = await fetchSubjects();
+      const tbody = document.querySelector('#subjects-table tbody');
+      tbody.innerHTML = '';
+      data.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${formatCell(r.program)}</td>
+          <td>${formatCell(r.grade_level)}</td>
+          <td>${formatCell(r.semester)}</td>
+          <td>${formatCell(r.subject)}</td>
+          <td><button class="btn small ghost" onclick="deleteSubject(${r.id})">Delete</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function deleteSubject(id) {
+      if (!confirm('Delete this subject?')) return;
+      const tid = document.getElementById('teacherId').value;
+      const res = await fetch('http://127.0.0.1:8080/api/teacher/delete-subject', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, teacher_id: tid })
+      });
+      const j = await res.json();
+      if (res.ok) { alert('Subject deleted'); loadSubjectsTable(); }
+      else alert(j.message || 'Error deleting subject');
+    }
+
+    function clearMaterialForm() {
+      ['new-material-program', 'new-material-grade', 'new-material-semester', 'new-material-subject'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('new-material-category').value = '';
+      document.getElementById('new-material-file').value = '';
+    }
+
+    async function addMaterial() {
+      const program = document.getElementById('new-material-program').value.trim();
+      const grade = document.getElementById('new-material-grade').value.trim();
+      const semester = document.getElementById('new-material-semester').value.trim();
+      const subject = document.getElementById('new-material-subject').value.trim();
+      const category = document.getElementById('new-material-category').value;
+      const file = document.getElementById('new-material-file').files[0];
+      if (!program || !grade || !semester || !subject || !category || !file) { alert('Please fill in all fields and select a file'); return; }
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('program', program);
+      formData.append('grade_level', grade);
+      formData.append('semester', semester);
+      formData.append('subject', subject);
+      formData.append('category', category);
+      const res = await fetch('http://127.0.0.1:8080/api/teacher/add-material', {
+        method: 'POST',
+        body: formData
+      });
+      const j = await res.json();
+      if (res.ok) { alert('Material uploaded'); loadMaterialsHierarchy(); clearMaterialForm(); }
+      else alert(j.message || 'Error uploading material');
+    }
+
+    async function loadMaterialsHierarchy() {
+      const res = await fetch(`http://127.0.0.1:8080/api/teacher/materials?teacher_id=${teacherId}`);
+      const data = (await res.json()).data || [];
+      const container = document.getElementById('materials-hierarchy');
+      container.innerHTML = '';
+
+      // Group data by program > grade_level > semester > subject > category
+      const grouped = {};
+      data.forEach(item => {
+        const p = item.program || 'Unknown';
+        const g = item.grade_level || 'Unknown';
+        const s = item.semester || 'Unknown';
+        const sub = item.subject || 'Unknown';
+        const cat = item.category || 'Unknown';
+        if (!grouped[p]) grouped[p] = {};
+        if (!grouped[p][g]) grouped[p][g] = {};
+        if (!grouped[p][g][s]) grouped[p][g][s] = {};
+        if (!grouped[p][g][s][sub]) grouped[p][g][s][sub] = {};
+        if (!grouped[p][g][s][sub][cat]) grouped[p][g][s][sub][cat] = [];
+        grouped[p][g][s][sub][cat].push(item);
+      });
+
+      function createList(obj, level = 0, path = []) {
+        const ul = document.createElement('ul');
+        ul.style.listStyle = 'none';
+        ul.style.paddingLeft = level * 20 + 'px';
+        for (const key in obj) {
+          const li = document.createElement('li');
+          li.style.marginBottom = '8px';
+          const span = document.createElement('span');
+          span.textContent = key;
+          span.style.fontWeight = 'bold';
+          span.style.cursor = 'pointer';
+          span.onclick = () => {
+            const sub = li.querySelector('ul');
+            if (sub) sub.style.display = sub.style.display === 'none' ? '' : 'none';
+          };
+          li.appendChild(span);
+          if (level >= 4) { // category level
+            const btn = document.createElement('button');
+            btn.className = 'btn small ghost';
+            btn.textContent = 'Delete';
+            btn.onclick = () => deleteMaterialFolder([...path, key]);
+            li.appendChild(btn);
+          }
+          if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+            li.appendChild(createList(obj[key], level + 1, [...path, key]));
+          }
+          ul.appendChild(li);
+        }
+        return ul;
+      }
+
+      container.appendChild(createList(grouped));
+    }
+
+    async function deleteMaterialFolder(path) {
+      if (!confirm('Delete this folder and all its contents?')) return;
+      const res = await fetch('http://127.0.0.1:8080/api/teacher/delete-material-folder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: path })
+      });
+      const j = await res.json();
+      if (res.ok) { alert('Folder deleted'); loadMaterialsHierarchy(); }
+      else alert(j.message || 'Error deleting folder');
+    }
+
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        window.location.href = '../../index.html';
+      }
+    }
+
+    async function refreshAll() {
+      await Promise.all([renderRealtimeTable(), renderOverallTable(), loadSubjectsTable(), loadMaterialsHierarchy()]);
+    }
+
+    // Add event listeners for subject assignment dropdowns
+    document.getElementById('assign-subject-program').addEventListener('change', populateAssignGradeDropdown);
+    document.getElementById('assign-subject-grade').addEventListener('change', populateAssignSemesterDropdown);
+    document.getElementById('assign-subject-semester').addEventListener('change', populateSubjectDropdown);
+
+    // Add event listeners for material upload dropdowns
+    document.getElementById('new-material-program').addEventListener('change', populateMaterialGradeDropdown);
+    document.getElementById('new-material-grade').addEventListener('change', populateMaterialSemesterDropdown);
+    document.getElementById('new-material-semester').addEventListener('change', populateMaterialSubjectDropdown);
+
+    // Add event listeners for grade level and semester in assign form
+    document.getElementById('assign-subject-grade').addEventListener('change', populateAssignSemesterDropdown);
+    document.getElementById('assign-subject-semester').addEventListener('change', populateSubjectDropdown);
+
+    window.addEventListener('load', refreshAll);
+  </script>
+</body>
+
+</html>

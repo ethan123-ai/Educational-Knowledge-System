@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Teacher Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: url('bg.png') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+        }
+
+        .overlay {
+            background: linear-gradient(rgba(255, 255, 255, 0.4),
+                    rgba(255, 255, 255, 0.1));
+            position: fixed;
+            inset: 0;
+            backdrop-filter: blur(3px);
+            z-index: 0;
+        }
+
+        header {
+            background: linear-gradient(to bottom,
+                    rgba(255, 255, 255, 0.85),
+                    rgba(255, 255, 255, 0.0));
+            padding: 10px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(6px);
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            height: 90px;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        @keyframes wiggle {
+            0% {
+                transform: rotate(0);
+            }
+
+            25% {
+                transform: rotate(6deg);
+            }
+
+            50% {
+                transform: rotate(-6deg);
+            }
+
+            75% {
+                transform: rotate(4deg);
+            }
+
+            100% {
+                transform: rotate(0);
+            }
+        }
+
+        .logo:active {
+            animation: wiggle 0.35s ease;
+        }
+
+        .header-text {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .main-title {
+            font-size: 23px;
+            font-weight: 700;
+            color: #C62828;
+            margin: 0;
+        }
+
+        .subtitle-small {
+            font-size: 14px;
+            color: #8B0000;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .ctu-logo {
+            height: 75px;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .ctu-logo:hover {
+            transform: scale(1.05);
+        }
+
+
+        /* LOGIN WRAPPER */
+        .login-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 120px);
+        }
+
+        .login-box {
+            width: 390px;
+            padding: 45px 40px;
+            border-radius: 28px;
+
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+
+            border: 2px solid rgba(183, 28, 28, 0.9);
+
+            background-image: linear-gradient(to bottom right,
+                    rgba(255, 255, 255, 0.2),
+                    rgba(230, 240, 255, 0.1));
+
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.25),
+                inset 0 0 60px rgba(255, 255, 255, 0.2);
+
+            text-align: center;
+        }
+
+        .login-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #B71C1C;
+            margin-bottom: 25px;
+        }
+
+        .input-container {
+            position: relative;
+            width: 100%;
+            margin: 14px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 40px 12px 4px;
+            border: none;
+            border-bottom: 3px solid #000;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-bottom-color: #C62828;
+            transform: translateY(-2px);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(0, 0, 0, 0.45);
+            transition: 0.3s ease;
+            font-size: 18px;
+        }
+
+        .input-field:focus+.input-icon {
+            color: #C62828;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #D32F2F, #B71C1C);
+            color: #fff;
+            font-size: 16px;
+            border: none;
+            border-radius: 12px;
+            margin-top: 22px;
+            cursor: pointer;
+            transition: 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+        }
+
+        .back-btn {
+            width: 100%;
+            padding: 11px;
+            background: #555;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 12px;
+            border: none;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #333;
+        }
+    </style>
+
+    <script src="../../static/js/main.js"></script>
+    <script>
+        function goHome() {
+            window.location.href = "../index.html";
+        }
+
+        function togglePasswordVisibility() {
+            const passwordField = document.getElementById('password');
+            const toggleIcon = document.getElementById('togglePassword');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (!username || !password) {
+                EK.showAlert('Please enter username and password', 'error');
+                return;
+            }
+            try {
+                const res = await fetch('http://localhost:8080/api/teacher/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const j = await res.json();
+                if (j.success) {
+                    localStorage.setItem('auth_token', j.token);
+                    localStorage.setItem('auth_expiry', Date.now() + 3600000); // 1 hour
+                    localStorage.setItem('user_name', j.name);
+                    window.location.href = j.redirect;
+                } else {
+                    EK.showAlert(j.message || 'Login failed', 'error');
+                }
+            } catch (e) {
+                EK.showAlert('Network error: ' + e.message, 'error');
+            }
+        }
+    </script>
+
+</head>
+
+<body>
+
+    <div class="overlay"></div>
+
+    <header>
+        <img src="eknows-logo.png" class="logo" onclick="goHome()">
+
+        <div class="header-text">
+            <span class="main-title">Educational Knowledge System</span>
+            <span class="subtitle-small">Premiere in Knowledge</span>
+        </div>
+
+        <a href="https://www.ctu.edu.ph" target="_blank">
+            <img src="ctu-logo.png" class="ctu-logo">
+        </a>
+    </header>
+
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-title">Teacher Login</div>
+
+            <div class="input-container">
+                <input type="text" id="username" class="input-field" placeholder="Username">
+                <i class="fas fa-user input-icon"></i>
+            </div>
+
+            <div class="input-container">
+                <input type="password" id="password" class="input-field" placeholder="Password">
+                <i class="fas fa-eye input-icon" id="togglePassword" onclick="togglePasswordVisibility()" style="cursor: pointer;"></i>
+            </div>
+
+            <button class="btn" onclick="login()">Login</button>
+
+            <button class="back-btn" onclick="window.location.href='../../index.html'">Back</button>
+        </div>
+    </div>
+
+</body>
+
+</html>

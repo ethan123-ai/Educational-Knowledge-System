@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Select Role</title>
+<style>
+    body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background: url('bg.png') no-repeat center center fixed;
+        background-size: cover;
+        color: #333;
+        position: relative;
+    }
+
+    /* Softer white overlay */
+    .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.25);
+        z-index: 0;
+        backdrop-filter: blur(3px);
+    }
+
+    header, .container {
+        position: relative;
+        z-index: 1;
+    }
+
+    header {
+        padding: 10px 28px;
+        border-bottom: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between; /* space between text and CTU logo */
+        background: rgba(255, 255, 255, 0.35);
+        backdrop-filter: blur(6px);
+    }
+
+    .logo {
+        height: 90px; /* bigger logo */
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    /* Wiggle animation */
+    @keyframes wiggle {
+        0% { transform: rotate(0); }
+        25% { transform: rotate(6deg); }
+        50% { transform: rotate(-6deg); }
+        75% { transform: rotate(4deg); }
+        100% { transform: rotate(0); }
+    }
+
+    .logo:active {
+        animation: wiggle 0.35s ease;
+    }
+
+    .header-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* center text horizontally */
+        justify-content: center;
+        line-height: 1.4; /* spacing between title and subtitle */
+        flex: 1; /* allows it to expand and stay centered */
+    }
+
+    .main-title {
+        font-size: 23px;
+        font-weight: 700;
+        color: #C62828;
+        margin: 0;
+    }
+
+    .subtitle-small {
+        font-size: 14px;
+        color: #8B0000;
+        font-weight: 600;
+        margin-top: 4px; /* spacing below main title */
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 70px 20px;
+    }
+
+    .title {
+        font-size: 36px;
+        margin-bottom: 10px;
+        color: #B71C1C;
+        font-weight: 700;
+    }
+
+    .subtitle {
+        font-size: 16px;
+        color: #555;
+        margin-bottom: 45px;
+    }
+
+    .role-wrapper {
+        display: flex;
+        gap: 25px;
+        flex-wrap: wrap;
+    }
+
+    .role-card {
+        width: 260px;
+        padding: 35px 25px;
+        border-radius: 18px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.12);
+        backdrop-filter: blur(10px);
+        transition: 0.3s ease;
+    }
+
+    .role-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0px 12px 28px rgba(0, 0, 0, 0.18);
+        background: rgba(255, 255, 255, 0.35);
+        border-color: #C62828;
+    }
+
+    /* ICON HOVER ANIMATION */
+    .icon {
+        font-size: 45px;
+        transition: 0.25s ease;
+        display: inline-block;
+    }
+
+    .icon:hover {
+        transform: translateY(-5px) rotate(3deg);
+    }
+
+    .role-title {
+        margin-top: 18px;
+        font-size: 22px;
+        font-weight: 700;
+        color: #B71C1C;
+    }
+
+    .role-desc {
+        margin: 12px 0;
+        color: #444;
+        font-size: 15px;
+    }
+
+    .btn {
+        margin-top: 18px;
+        padding: 10px 22px;
+        background: #C62828;
+        color: #fff;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+    .btn:hover { background: #B71C1C; }
+
+    /* CTU logo on the right */
+    .ctu-logo {
+        height: 75px; /* adjust size as needed */
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .ctu-logo:hover {
+        transform: scale(1.05);
+    }
+</style>
+
+<script>
+function goHome() {
+    window.location.href = "index.html";
+}
+</script>
+
+</head>
+<body>
+
+<div class="overlay"></div>
+
+<header>
+    <!-- Left: E-Knows logo -->
+    <img src="eknows-logo.png" class="logo" onclick="goHome()">
+
+    <!-- Center: Text -->
+    <div class="header-text">
+        <span class="main-title">Educational Knowledge System</span>
+        <span class="subtitle-small">Premiere in Knowledge</span>
+    </div>
+
+    <!-- Right: CTU logo -->
+    <a href="https://www.ctu.edu.ph" target="_blank">
+        <img src="ctu-logo.png" class="ctu-logo">
+    </a>
+</header>
+
+<div class="container">
+    <div class="title">Select Your Role</div>
+    <div class="subtitle">Please choose how you want to continue.</div>
+
+    <div class="role-wrapper">
+
+        <div class="role-card">
+            <div class="icon">🛡️</div>
+            <div class="role-title">Admin</div>
+            <div class="role-desc">Manage system, users, and settings.</div>
+            <button class="btn" onclick="location.href='templates/admin/admin-login.html'">Continue</button>
+        </div>
+
+        <div class="role-card">
+            <div class="icon">📚</div>
+            <div class="role-title">Teacher</div>
+            <div class="role-desc">Access teaching tools and manage classes.</div>
+            <button class="btn" onclick="location.href='templates/teacher/teacher-login.html'">Continue</button>
+        </div>
+
+        <div class="role-card">
+            <div class="icon">🎓</div>
+            <div class="role-title">Student</div>
+            <div class="role-desc">Go to your learning dashboard.</div>
+            <button class="btn" onclick="location.href='templates/student/student_panel.html'">Continue</button>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

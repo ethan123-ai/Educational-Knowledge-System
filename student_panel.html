@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Student Verification</title>
+
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin:0; height:100%; font-family:Inter, system-ui; }
+
+    body {
+      background: url('bg.png') no-repeat center center fixed;
+      background-size: cover;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      padding: 40px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.85);
+      padding: 30px;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      border: 1px solid rgba(179,0,0,0.08);
+    }
+
+    h1 {
+      font-size: 28px;
+      margin: 0 0 10px;
+      color: #b30000;
+      font-weight: 800;
+    }
+
+    .subtext {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    label {
+      font-weight: 700;
+      margin-bottom: 6px;
+      display:block;
+      color:#333;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.08);
+      font-size: 15px;
+      background: #fff;
+    }
+
+    .row {
+      display:flex;
+      gap:20px;
+      margin-bottom:20px;
+    }
+    .col { flex:1; }
+
+    .btn {
+      background:#b30000;
+      color:#fff;
+      padding:10px 16px;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:15px;
+      box-shadow: 0 4px 10px rgba(179,0,0,0.25);
+    }
+
+    .btn:disabled {
+      opacity:0.5;
+      cursor:not-allowed;
+    }
+
+    .materials-box {
+      margin-top:30px;
+      padding:20px;
+      background:#fff;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,0.06);
+      box-shadow:0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    .category-group {
+      margin-bottom:20px;
+      padding-bottom:12px;
+      border-bottom:1px dashed rgba(0,0,0,0.15);
+    }
+
+    .category-title {
+      font-weight:800;
+      color:#b30000;
+      margin-bottom:8px;
+    }
+
+    .file-item {
+      padding:5px 0;
+      border-bottom:1px dashed rgba(0,0,0,0.05);
+      font-size:14px;
+    }
+
+    .alert {
+      background:#f8d7da;
+      color:#721c24;
+      border:1px solid #f5c6cb;
+      padding:12px;
+      border-radius:8px;
+      margin-bottom:20px;
+      font-weight:600;
+      display:none;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Student Verification</h1>
+  <div class="subtext">Select your course details to access materials.</div>
+
+  <div id="alert" class="alert"></div>
+
+  <div class="row">
+    <div class="col">
+      <label>Program</label>
+      <select id="program-select"></select>
+    </div>
+    <div class="col">
+      <label>Teacher</label>
+      <select id="teacher-select"></select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <label>Grade Level</label>
+      <select id="grade-select"></select>
+    </div>
+    <div class="col">
+      <label>Semester</label>
+      <select id="semester-select"></select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <label>Subject</label>
+      <select id="subject-select"></select>
+    </div>
+    <div class="col">
+      <label>Access Code</label>
+      <input type="text" id="access-code" placeholder="Enter teacher's access code" />
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 10px; align-items: center;">
+    <button class="btn" onclick="loadMaterials()">View Materials</button>
+    <button class="btn" onclick="location.href='/frontend/index.html'" style="background: #666;">Cancel</button>
+  </div>
+
+  <div id="materials-container"></div>
+</div>
+
+<script>
+  const alertBox = document.getElementById("alert");
+
+  function showAlert(msg){
+    alertBox.textContent = msg;
+    alertBox.style.display = "block";
+    setTimeout(()=> alertBox.style.display="none", 3000);
+  }
+
+  async function loadPrograms(){
+    const res = await fetch("http://127.0.0.1:8080/api/admin/get-subjects");
+    const data = await res.json();
+    const select = document.getElementById("program-select");
+    const uniquePrograms = [...new Set(data.subjects.map(s => s.program))];
+    select.innerHTML = "<option value=''>Select...</option>";
+    uniquePrograms.forEach(p=>{
+      select.innerHTML += `<option value="${p}">${p}</option>`;
+    });
+  }
+
+  async function loadTeachersByProgram(){
+    const program = document.getElementById("program-select").value;
+    const select = document.getElementById("teacher-select");
+
+    if(!program){
+      select.innerHTML = "<option value=''>Select...</option>";
+      return;
+    }
+
+    const res = await fetch(`http://127.0.0.1:8080/api/student/get-teachers-by-program?program=${encodeURIComponent(program)}`);
+    const data = await res.json();
+    select.innerHTML = "<option value=''>Select...</option>";
+    data.teachers.forEach(t=>{
+      select.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+    });
+  }
+
+  async function loadGradeLevels(){
+    const program = document.getElementById("program-select").value;
+    const teacher = document.getElementById("teacher-select").value;
+    const select = document.getElementById("grade-select");
+
+    if(!program || !teacher){
+      select.innerHTML = "<option value=''>Select...</option>";
+      return;
+    }
+
+    const res = await fetch(`http://127.0.0.1:8080/api/student/get-grade-levels?program=${encodeURIComponent(program)}&teacher_id=${teacher}`);
+    const data = await res.json();
+    select.innerHTML = "<option value=''>Select...</option>";
+    data.grade_levels.forEach(g=>{
+      select.innerHTML += `<option value="${g}">${g} Year</option>`;
+    });
+  }
+
+  async function loadSemesters(){
+    const program = document.getElementById("program-select").value;
+    const teacher = document.getElementById("teacher-select").value;
+    const grade = document.getElementById("grade-select").value;
+    const select = document.getElementById("semester-select");
+
+    if(!program || !teacher || !grade){
+      select.innerHTML = "<option value=''>Select...</option>";
+      return;
+    }
+
+    const res = await fetch(`http://127.0.0.1:8080/api/student/get-semesters?program=${encodeURIComponent(program)}&teacher_id=${teacher}&grade_level=${encodeURIComponent(grade)}`);
+    const data = await res.json();
+    select.innerHTML = "<option value=''>Select...</option>";
+    data.semesters.forEach(sem=>{
+      select.innerHTML += `<option value="${sem}">${sem} Semester</option>`;
+    });
+  }
+
+  async function loadSubjects(){
+    const program = document.getElementById("program-select").value;
+    const teacher = document.getElementById("teacher-select").value;
+    const grade = document.getElementById("grade-select").value;
+    const sem = document.getElementById("semester-select").value;
+    const select = document.getElementById("subject-select");
+
+    if(!program || !teacher || !grade || !sem){
+      select.innerHTML = "<option value=''>Select...</option>";
+      return;
+    }
+
+    const res = await fetch(`http://127.0.0.1:8080/api/student/get-subjects?program=${encodeURIComponent(program)}&teacher_id=${teacher}&grade_level=${encodeURIComponent(grade)}&semester=${encodeURIComponent(sem)}`);
+    const data = await res.json();
+    select.innerHTML = "<option value=''>Select...</option>";
+    data.subjects.forEach(s=>{
+      select.innerHTML += `<option value="${s.id}">${s.subject}</option>`;
+    });
+  }
+
+  async function loadMaterials(){
+    const program = document.getElementById("program-select").value;
+    const teacher = document.getElementById("teacher-select").value;
+    const grade = document.getElementById("grade-select").value;
+    const sem = document.getElementById("semester-select").value;
+    const subject = document.getElementById("subject-select").value;
+    const code = document.getElementById("access-code").value.trim();
+
+    if(!program || !teacher || !grade || !sem || !subject || !code){
+      showAlert("Please select all fields and enter access code.");
+      return;
+    }
+
+    const res = await fetch("http://127.0.0.1:8080/api/student/materials", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ teacher_id: parseInt(teacher), access_code: code, subject_id: parseInt(subject) })
+    });
+    const data = await res.json();
+
+    if(!data.success){
+      showAlert(data.message);
+      return;
+    }
+
+    const container = document.getElementById("materials-container");
+    container.innerHTML = `<div class="materials-box"><h3>Materials</h3></div>`;
+
+    const box = container.querySelector(".materials-box");
+
+    const categories = {};
+
+    data.materials.forEach(m=>{
+      if(!categories[m.category]) categories[m.category] = [];
+      categories[m.category].push(m);
+    });
+
+    for(const cat in categories){
+      const group = document.createElement("div");
+      group.className = "category-group";
+      group.innerHTML = `<div class="category-title">${cat}</div>`;
+
+      categories[cat].forEach(file=>{
+        group.innerHTML += `<div class="file-item">
+          <a href="${file.stored_path}" download>${file.original_filename}</a>
+        </div>`;
+      });
+
+      box.appendChild(group);
+    }
+  }
+
+  document.getElementById("program-select").addEventListener("change", () => {
+    loadTeachersByProgram();
+    document.getElementById("teacher-select").value = '';
+    document.getElementById("grade-select").value = '';
+    document.getElementById("semester-select").value = '';
+    document.getElementById("subject-select").value = '';
+  });
+  document.getElementById("teacher-select").addEventListener("change", () => {
+    loadGradeLevels();
+    document.getElementById("grade-select").value = '';
+    document.getElementById("semester-select").value = '';
+    document.getElementById("subject-select").value = '';
+  });
+  document.getElementById("grade-select").addEventListener("change", () => {
+    loadSemesters();
+    document.getElementById("semester-select").value = '';
+    document.getElementById("subject-select").value = '';
+  });
+  document.getElementById("semester-select").addEventListener("change", () => {
+    loadSubjects();
+    document.getElementById("subject-select").value = '';
+  });
+
+  loadPrograms();
+</script>
+
+</body>
+</html>

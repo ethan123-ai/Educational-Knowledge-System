@@ -1,0 +1,1064 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Panel</title>
+  <style>
+    /* Basic reset */
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    body {
+      background: url('bg.png') no-repeat center center fixed;
+      background-size: cover;
+      color: #222;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      position: relative;
+    }
+
+
+
+    /* ---------- Layout ---------- */
+    .app {
+      display: flex;
+      min-height: 100vh;
+      gap: 28px;
+      padding: 28px;
+    }
+
+    aside.sidebar {
+      width: 260px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(220, 20, 30, 0.06);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 28px;
+      left: 28px;
+      height: calc(100vh - 56px);
+      overflow-y: auto;
+      gap: 20px;
+    }
+
+    main {
+      flex: 1;
+      min-width: 0;
+      margin-left: 288px;
+    }
+
+    /* ---------- Sidebar content ---------- */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #f8f8f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      border: 2px solid rgba(220, 20, 30, 0.12);
+    }
+
+    .logo-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .brand h3 {
+      margin: 0;
+      font-size: 24px;
+      color: #b30000;
+      font-weight: 700;
+    }
+
+    nav.menu {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    nav.menu button {
+      text-align: left;
+      background: transparent;
+      border: none;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #333;
+    }
+
+    nav.menu button.active {
+      background: linear-gradient(180deg, rgba(255, 235, 235, 0.9), rgba(255, 245, 245, 0.9));
+      color: #b30000;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    /* ---------- Page header ---------- */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .page-header h1 {
+      margin: 0;
+      font-size: 22px;
+      color: #111;
+    }
+
+    .small-note {
+      color: #666;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    /* ---------- Card & glass boxes ---------- */
+    .card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .glass {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.6));
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid rgba(179, 0, 0, 0.06);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+    }
+
+    /* ---------- Buttons ---------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid rgba(179, 0, 0, 0.12);
+    }
+
+    .btn.primary {
+      background: #b30000;
+      color: #fff;
+      border-color: rgba(179, 0, 0, 0.9);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: #b30000;
+      border: 1px solid rgba(179, 0, 0, 0.12);
+    }
+
+    .btn.small {
+      padding: 6px 8px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    /* ---------- Table styles ---------- */
+    .table-wrap {
+      overflow: auto;
+      margin-top: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 700px;
+      background: #fff;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #555;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      background: linear-gradient(180deg, #fff, #fafafa);
+    }
+
+    tbody td {
+      padding: 12px 14px;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.03);
+      font-size: 14px;
+      color: #222;
+      vertical-align: middle;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: rgba(0, 0, 0, 0.01);
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* ---------- Hierarchy styles ---------- */
+    .hierarchy {
+      margin-top: 12px;
+    }
+
+    .program {
+      margin-bottom: 20px;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .program-header {
+      padding: 12px 14px;
+      background: linear-gradient(180deg, #fff, #fafafa);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      font-weight: 700;
+      color: #333;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .program-content {
+      display: none;
+      padding: 0;
+    }
+
+    .program-content.open {
+      display: block;
+    }
+
+    .grade {
+      margin: 10px;
+      border-left: 3px solid #b30000;
+      padding-left: 10px;
+    }
+
+    .grade-header {
+      font-weight: 600;
+      color: #b30000;
+      margin-bottom: 5px;
+    }
+
+    .semester {
+      margin-left: 10px;
+      margin-bottom: 10px;
+    }
+
+    .semester-header {
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 5px;
+    }
+
+    .subject {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.03);
+    }
+
+    .subject-name {
+      flex: 1;
+    }
+
+    .subject-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .pill.gray {
+      background: #f3f3f3;
+      color: #444;
+      border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .pill.red {
+      background: #fff0f0;
+      color: #b30000;
+      border: 1px solid rgba(179, 0, 0, 0.08);
+    }
+
+    /* ---------- Form inputs ---------- */
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #333;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .col {
+      flex: 1;
+    }
+
+    /* ---------- Small utilities ---------- */
+    .muted {
+      color: #777;
+      font-size: 13px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #666;
+    }
+
+    /* ---------- Alerts ---------- */
+    .alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      font-weight: 600;
+      max-width: 300px;
+      word-wrap: break-word;
+    }
+
+    .alert.success {
+      background: #d4edda;
+      border-color: #c3e6cb;
+      color: #155724;
+    }
+
+    .alert.error {
+      background: #f8d7da;
+      border-color: #f5c6cb;
+      color: #721c24;
+    }
+
+    /* responsive */
+    @media (max-width:900px) {
+      aside.sidebar {
+        display: none;
+      }
+
+      .app {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar card" aria-label="Sidebar">
+      <div class="brand">
+        <div class="logo-circle" title="eknows logo">
+          <img src="eknows-logo.png" alt="eknows logo" id="eknows-logo" />
+          <!-- If logo not available, fallback to initial -->
+          <span id="logo-fallback" style="display:none; font-weight:800; color:#b30000;">E</span>
+        </div>
+        <div>
+          <h3>Admin</h3>
+          <div class="small-note muted">Signed in</div>
+        </div>
+      </div>
+
+      <nav class="menu" role="navigation" aria-label="Main menu">
+        <button class="active" data-view="dashboard">Dashboard</button>
+        <button data-view="programs">Program Management</button>
+        <button data-view="teachers">Teacher Management</button>
+        <button onclick="logout()">Logout</button>
+      </nav>
+
+      <div style="margin-top:auto;">
+        <div class="muted small">Version 1.0</div>
+      </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <main>
+      <!-- DASHBOARD VIEW -->
+      <section id="view-dashboard">
+        <div class="page-header">
+          <div>
+            <h1>Dashboard</h1>
+            <div class="small-note">Overview of uploads and tracking</div>
+          </div>
+        </div>
+
+        <!-- Real-time Tracking -->
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <div style="font-weight:800; font-size:15px;">Real-time Tracking</div>
+              <div class="small muted">Daily uploads by teacher (today)</div>
+            </div>
+            <div>
+              <div class="muted small">Records per page:
+                <select id="rt-per-page" onchange="renderRealtimeTable()">
+                  <option>10</option>
+                  <option>25</option>
+                  <option>50</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table id="realtime-table" aria-describedby="Realtime table">
+              <thead>
+                <tr>
+                  <th>Program</th>
+                  <th>Teacher</th>
+                  <th>Subject</th>
+                  <th>Category</th>
+                  <th style="width:140px;">Daily Uploads</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Data Visualization -->
+        <div class="card" style="margin-top:18px;">
+          <div class="section-title">
+            <div>
+              <div style="font-weight:800; font-size:15px;">Data Visualization</div>
+              <div class="small muted">Overall uploads by teacher</div>
+            </div>
+            <div class="muted small">Search: <input type="text" id="global-search" placeholder="Search..."
+                oninput="renderOverallTable()" /></div>
+          </div>
+
+          <div class="table-wrap">
+            <table id="overall-table">
+              <thead>
+                <tr>
+                  <th>Program</th>
+                  <th>Teacher</th>
+                  <th>Subject</th>
+                  <th>Category</th>
+                  <th style="width:160px;">Total Uploads</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROGRAMS VIEW -->
+      <section id="view-programs" style="display:none;">
+        <div class="page-header">
+          <div>
+            <h1>Program Management</h1>
+            <div class="small-note">Add or remove available programs</div>
+          </div>
+          <div></div>
+        </div>
+
+        <div class="glass card">
+          <div class="row">
+            <div class="col">
+              <label for="new-program-name">Program Name</label>
+              <input id="new-program-name" type="text"
+                placeholder="Complete program name e.g. Bachelor of Science in Computer Science" />
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <label>Subjects (one per line for each grade level and semester)</label>
+            <div class="row">
+              <div class="col">
+                <label>1st Year - 1st Semester</label>
+                <textarea id="subjects-1st-1st" rows="4" placeholder="Subject1&#10;Subject2&#10;..."></textarea>
+              </div>
+              <div class="col">
+                <label>1st Year - 2nd Semester</label>
+                <textarea id="subjects-1st-2nd" rows="4" placeholder="Subject1&#10;Subject2&#10;..."></textarea>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>2nd Year - 1st Semester</label>
+                <textarea id="subjects-2nd-1st" rows="4" placeholder="Subject1&#10;Subject2&#10;..."></textarea>
+              </div>
+              <div class="col">
+                <label>2nd Year - 2nd Semester</label>
+                <textarea id="subjects-2nd-2nd" rows="4" placeholder="Subject1&#10;Subject2&#10;..."></textarea>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>3rd Year - 1st Semester</label>
+                <textarea id="subjects-3rd-1st" rows="4" placeholder="Subject1&#10;Subject2&#10;..."></textarea>
+              </div>
+              <div class="col">
+                <label>3rd Year - 2nd Semester</label>
+                <textarea id="subjects-3rd-2nd" rows="4" placeholder="Subject1&#10;Subject2&#10;..."></textarea>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>4th Year - 1st Semester</label>
+                <textarea id="subjects-4th-1st" rows="4" placeholder="Subject1&#10;Subject2&#10;..."></textarea>
+              </div>
+              <div class="col">
+                <label>4th Year - 2nd Semester</label>
+                <textarea id="subjects-4th-2nd" rows="4" placeholder="Subject1&#10;Subject2&#10;..."></textarea>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+            <button class="btn primary" onclick="addProgram(this)">Add Program</button>
+            <button class="btn ghost" onclick="clearProgramForm()">Cancel</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:18px;">
+          <div class="section-title">
+            <div style="font-weight:800;">Programs</div>
+          </div>
+
+          <div class="table-wrap">
+            <table id="programs-table">
+              <thead>
+                <tr>
+                  <th>Program Name</th>
+                  <th style="width:140px;">Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:18px;">
+          <div class="section-title">
+            <div style="font-weight:800;">Subjects</div>
+          </div>
+
+          <div class="table-wrap">
+            <table id="subjects-table">
+              <thead>
+                <tr>
+                  <th>Program</th>
+                  <th>Grade Level</th>
+                  <th>Semester</th>
+                  <th>Subject</th>
+                  <th>Teacher</th>
+                  <th style="width:140px;">Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TEACHERS VIEW -->
+      <section id="view-teachers" style="display:none;">
+        <div class="page-header">
+          <div>
+            <h1>Teacher Management</h1>
+            <div class="small-note">Add or remove teachers</div>
+          </div>
+          <div></div>
+        </div>
+
+        <div class="glass card">
+          <div class="row">
+            <div class="col">
+              <label for="teacher-name">Teacher Name</label>
+              <input id="teacher-name" type="text" placeholder="Full name" />
+            </div>
+            <div class="col">
+              <label for="teacher-username">Username</label>
+              <input id="teacher-username" type="text" placeholder="Username" />
+            </div>
+            <div class="col">
+              <label for="teacher-password">Password</label>
+              <input id="teacher-password" type="password" placeholder="Password" />
+            </div>
+            <div class="col">
+              <label for="teacher-access">Access Code</label>
+              <input id="teacher-access" type="text" placeholder="Access code" />
+            </div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+            <button class="btn primary" onclick="addTeacher()">Add</button>
+            <button class="btn ghost"
+              onclick="['teacher-name','teacher-username','teacher-password','teacher-access'].forEach(id=>document.getElementById(id).value='')">Cancel</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:18px;">
+          <div class="section-title">
+            <div style="font-weight:800;">Teachers</div>
+          </div>
+
+          <div class="table-wrap">
+            <table id="teachers-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Username</th>
+                  <th>Password</th>
+                  <th>Access Code</th>
+                  <th style="width:140px;">Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="../../static/js/main.js"></script>
+  <script>
+    /*************************************************************************
+     *  Integration with API endpoints.
+     *  Endpoints used:
+     *    GET  /api/admin/get-tracking-data (for overall uploads)
+     *    GET  /api/admin/get-programs
+     *    POST /api/admin/add-program {name}
+     *    DELETE /api/admin/delete-program/:id
+     *    GET  /api/admin/get-teachers
+     *    POST /api/admin/add-teacher {name, username, password, accessCode}
+     *    DELETE /api/admin/delete-teacher/:id
+     *************************************************************************/
+
+    // ---------------- utility & rendering ----------------
+    const views = { dashboard: document.getElementById('view-dashboard'), programs: document.getElementById('view-programs'), teachers: document.getElementById('view-teachers') };
+    document.querySelectorAll('nav.menu button').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        document.querySelectorAll('nav.menu button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const view = btn.dataset.view;
+        for (const k in views) views[k].style.display = (k === view ? '' : 'none');
+        if (view === 'programs') {
+          await renderProgramsTable();
+          await loadSubjectsHierarchy();
+        }
+      });
+    });
+
+    function formatCell(txt) { if (txt === null || txt === undefined) return ''; return String(txt); }
+
+    // ---------- Realtime Table (using overall data for now, as daily not implemented) ----------
+    async function fetchRealtime(limit = 25) {
+      // For now, use overall data; TODO: implement daily filter
+      const response = await fetch('http://127.0.0.1:8080/api/admin/get-tracking-data');
+      if (!response.ok) throw new Error('Failed to fetch realtime data');
+      const data = await response.json();
+      return data.tracking || [];
+    }
+    async function renderRealtimeTable() {
+      const perPage = parseInt(document.getElementById('rt-per-page').value || 10, 10);
+      const data = await fetchRealtime(perPage);
+      const tbody = document.querySelector('#realtime-table tbody');
+      tbody.innerHTML = '';
+      data.slice(0, perPage).forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${formatCell(row.program)}</td>
+          <td>${formatCell(row.teacher)}</td>
+          <td>${formatCell(row.subject)}</td>
+          <td>${formatCell(row.category)}</td>
+          <td><div class="pill red" style="font-weight:800">${row.uploads}</div></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ---------- Overall Table ----------
+    async function fetchOverall() {
+      const response = await fetch('http://127.0.0.1:8080/api/admin/get-tracking-data');
+      if (!response.ok) throw new Error('Failed to fetch overall data');
+      const data = await response.json();
+      return data.tracking || [];
+    }
+    async function renderOverallTable() {
+      const search = document.getElementById('global-search').value.trim().toLowerCase();
+      const data = await fetchOverall();
+      const tbody = document.querySelector('#overall-table tbody');
+      tbody.innerHTML = '';
+      data.filter(r => {
+        if (!search) return true;
+        return [r.program, r.teacher, r.subject, r.category].join(' ').toLowerCase().includes(search);
+      }).forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${formatCell(row.program)}</td>
+          <td>${formatCell(row.teacher)}</td>
+          <td>${formatCell(row.subject)}</td>
+          <td>${formatCell(row.category)}</td>
+          <td><div class="pill gray" style="font-weight:800">${row.uploads}</div></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ---------- Programs ----------
+    async function fetchPrograms() {
+      const response = await fetch('http://127.0.0.1:8080/api/admin/get-programs');
+      if (!response.ok) throw new Error('Failed to fetch programs');
+      const data = await response.json();
+      return data.programs || [];
+    }
+    async function renderProgramsTable() {
+      try {
+        const data = await fetchPrograms();
+        const tbody = document.querySelector('#programs-table tbody');
+        tbody.innerHTML = '';
+        data.forEach(p => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${formatCell(p.name)}</td>
+            <td class="actions">
+              <button class="btn small" onclick="deleteProgram(${p.id}, this)" style="background:#fff;border:1px solid rgba(179,0,0,0.08);color:#b30000">Delete</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (e) {
+        EK.showAlert('Error loading programs', 'error');
+      }
+    }
+    async function deleteProgram(id, btn) {
+      if (!confirm('Delete this program?')) return;
+      EK.setButtonLoading(btn, true);
+      try {
+        const response = await fetch(`http://127.0.0.1:8080/api/admin/delete-program?id=${id}`, { method: 'DELETE' });
+        if (!response.ok) { EK.showAlert('Failed to delete program', 'error'); return; }
+        EK.showAlert('Program deleted successfully', 'success');
+        await renderProgramsTable();
+        await loadSubjectsHierarchy();
+      } catch (e) {
+        EK.showAlert('Network error while deleting program', 'error');
+      } finally {
+        EK.setButtonLoading(btn, false);
+      }
+    }
+
+    // ---------- Subjects ----------
+    async function fetchSubjects() {
+      const response = await fetch('http://127.0.0.1:8080/api/admin/get-subjects');
+      if (!response.ok) throw new Error('Failed to fetch subjects');
+      const data = await response.json();
+      return data.subjects || [];
+    }
+    async function addProgram(button) {
+      const programName = document.getElementById("new-program-name").value.trim();
+      if (!programName) {
+        alert("Please enter the program name.");
+        return;
+      }
+
+      // Collect all subjects, filter out empty lines, and structure as expected by backend
+      const subjects = {};
+      const gradeMappings = {
+        "1st": "1st",
+        "2nd": "2nd",
+        "3rd": "3rd",
+        "4th": "4th"
+      };
+      const semesterMappings = {
+        "1st": "1st Semester",
+        "2nd": "2nd Semester"
+      };
+
+      for (const gradeKey in gradeMappings) {
+        const grade = gradeMappings[gradeKey];
+        subjects[grade] = {};
+        for (const semKey in semesterMappings) {
+          const semester = semesterMappings[semKey];
+          const textareaId = `subjects-${gradeKey}-${semKey}`;
+          const subjectList = document.getElementById(textareaId).value.trim().split("\n").filter(s => s.trim());
+          if (subjectList.length > 0) {
+            subjects[grade][semester] = subjectList;
+          }
+        }
+      }
+
+      // Send to backend
+      try {
+        const response = await fetch('http://127.0.0.1:8080/api/admin/add-program', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: programName, subjects_json: JSON.stringify(subjects) })
+        });
+        const data = await response.json();
+        if (!data.success) {
+          throw new Error(data.message || 'Failed to add program');
+        }
+        alert("Program added successfully!");
+        clearProgramForm();
+        await renderProgramsTable();
+        await loadSubjectsHierarchy();
+      } catch (e) {
+        alert("Error adding program: " + e.message);
+      }
+    }
+    function clearProgramForm() {
+      document.getElementById('new-program-name').value = '';
+      const grades = ['1st', '2nd', '3rd', '4th'];
+      const semesters = ['1st', '2nd'];
+      grades.forEach(grade => {
+        semesters.forEach(semester => {
+          document.getElementById(`subjects-${grade}-${semester}`).value = '';
+        });
+      });
+    }
+    async function deleteSubject(id, btn) {
+      if (!confirm('Delete this subject?')) return;
+      EK.setButtonLoading(btn, true);
+      try {
+        const response = await fetch(`http://127.0.0.1:8080/api/admin/delete-subject?id=${id}`, { method: 'DELETE' });
+        if (!response.ok) { EK.showAlert('Failed to delete subject', 'error'); return; }
+        EK.showAlert('Subject deleted successfully', 'success');
+        await loadSubjectsHierarchy();
+      } catch (e) {
+        EK.showAlert('Network error while deleting subject', 'error');
+      } finally {
+        EK.setButtonLoading(btn, false);
+      }
+    }
+    async function renderSubjectsTable() {
+      try {
+        const data = await fetchSubjects();
+        const tbody = document.querySelector('#subjects-table tbody');
+        tbody.innerHTML = '';
+        data.forEach(s => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${formatCell(s.program)}</td>
+            <td>${formatCell(s.grade_level)}</td>
+            <td>${formatCell(s.semester)}</td>
+            <td>${formatCell(s.subject)}</td>
+            <td class="actions">
+              <button class="btn small" onclick="deleteSubject(${s.id}, this)" style="background:#fff;border:1px solid rgba(179,0,0,0.08);color:#b30000">Delete</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (e) {
+        EK.showAlert('Error loading subjects', 'error');
+      }
+    }
+
+    // ---------- Teachers ----------
+    async function fetchTeachers() {
+      const response = await fetch('http://127.0.0.1:8080/api/admin/get-teachers');
+      if (!response.ok) throw new Error('Failed to fetch teachers');
+      const data = await response.json();
+      return data.teachers || [];
+    }
+    async function addTeacher() {
+      const name = (document.getElementById('teacher-name').value || '').trim();
+      const username = (document.getElementById('teacher-username').value || '').trim();
+      const password = (document.getElementById('teacher-password').value || '').trim();
+      const access_code = (document.getElementById('teacher-access').value || '').trim();
+      if (!name || !username || !password || !access_code) { alert('Please enter the information'); return; }
+      try {
+        const response = await fetch('http://127.0.0.1:8080/api/admin/add-teacher', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, username, password, access_code })
+        });
+        if (!response.ok) { EK.showAlert('Failed to add teacher', 'error'); return; }
+        EK.showAlert('Teacher added successfully', 'success');
+        ['teacher-name', 'teacher-username', 'teacher-password', 'teacher-access'].forEach(id => document.getElementById(id).value = '');
+        renderTeachersTable();
+      } catch (e) {
+        EK.showAlert('Network error while adding teacher', 'error');
+      }
+    }
+    async function deleteTeacher(id) {
+      if (!confirm('Delete this teacher?')) return;
+      try {
+        const response = await fetch(`http://127.0.0.1:8080/api/admin/delete-teacher?id=${id}`, { method: 'DELETE' });
+        if (!response.ok) { EK.showAlert('Failed to delete teacher', 'error'); return; }
+        EK.showAlert('Teacher deleted successfully', 'success');
+        renderTeachersTable();
+      } catch (e) {
+        EK.showAlert('Network error while deleting teacher', 'error');
+      }
+    }
+    async function renderTeachersTable() {
+      const data = await fetchTeachers();
+      const tbody = document.querySelector('#teachers-table tbody');
+      tbody.innerHTML = '';
+      data.forEach(t => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${formatCell(t.name)}</td>
+          <td>${formatCell(t.username)}</td>
+          <td>${formatCell(t.password)}</td>
+          <td>${formatCell(t.access_code)}</td>
+          <td class="actions">
+            <button class="btn small" onclick="deleteTeacher(${t.id})" style="background:#fff;border:1px solid rgba(179,0,0,0.08);color:#b30000">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ---------- Logout ----------
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        window.location.href = '../../index.html';
+      }
+    }
+
+    // ---------- Subjects Hierarchy ----------
+    async function loadSubjectsHierarchy() {
+      try {
+        const data = await fetchSubjects();
+        const hierarchyContainer = document.querySelector('.hierarchy');
+        if (!hierarchyContainer) return;
+        hierarchyContainer.innerHTML = '';
+
+        // Group subjects by program, then by grade, then by semester
+        const grouped = {};
+        data.forEach(s => {
+          if (!grouped[s.program]) grouped[s.program] = {};
+          if (!grouped[s.program][s.grade_level]) grouped[s.program][s.grade_level] = {};
+          if (!grouped[s.program][s.grade_level][s.semester]) grouped[s.program][s.grade_level][s.semester] = [];
+          grouped[s.program][s.grade_level][s.semester].push(s);
+        });
+
+        // Render hierarchy
+        for (const program in grouped) {
+          const programDiv = document.createElement('div');
+          programDiv.className = 'program';
+          programDiv.innerHTML = `
+            <div class="program-header" onclick="toggleProgram(this)">
+              <span>${program}</span>
+              <span class="toggle-icon">▶</span>
+            </div>
+            <div class="program-content">
+              ${Object.keys(grouped[program]).map(grade => `
+                <div class="grade">
+                  <div class="grade-header">${grade}</div>
+                  ${Object.keys(grouped[program][grade]).map(semester => `
+                    <div class="semester">
+                      <div class="semester-header">${semester}</div>
+                      ${grouped[program][grade][semester].map(subject => `
+                        <div class="subject">
+                          <span class="subject-name">${subject.subject}</span>
+                          <div class="subject-actions">
+                            <button class="btn small" onclick="deleteSubject(${subject.id}, this)" style="background:#fff;border:1px solid rgba(179,0,0,0.08);color:#b30000">Delete</button>
+                          </div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  `).join('')}
+                </div>
+              `).join('')}
+            </div>
+          `;
+          hierarchyContainer.appendChild(programDiv);
+        }
+      } catch (e) {
+        EK.showAlert('Error loading subjects hierarchy', 'error');
+      }
+    }
+
+    function toggleProgram(header) {
+      const content = header.nextElementSibling;
+      const icon = header.querySelector('.toggle-icon');
+      if (content.classList.contains('open')) {
+        content.classList.remove('open');
+        icon.textContent = '▶';
+      } else {
+        content.classList.add('open');
+        icon.textContent = '▼';
+      }
+    }
+
+    // ---------- Initialization ----------
+    async function refreshAll() {
+      await Promise.all([renderRealtimeTable(), renderOverallTable(), renderProgramsTable(), renderTeachersTable()]);
+    }
+
+    // try to load a logo (if you provide src) else show fallback letter
+    (function setupLogo() {
+      const img = document.getElementById('eknows-logo');
+      const fallback = document.getElementById('logo-fallback');
+      img.addEventListener('error', () => { img.style.display = 'none'; fallback.style.display = 'block'; });
+    })();
+
+    // run initial render
+    refreshAll();
+  </script>
+</body>
+
+</html>
